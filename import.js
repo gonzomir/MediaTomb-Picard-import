@@ -73,15 +73,16 @@ function addAudio(obj)
         desc = desc + ', ' + date;
     }
     
-    var genre = obj.meta[M_GENRE];
-    if (!genre)
-    {
-        genre = 'Unknown';
-    }
-    else
-    {
-        desc = desc + ', ' + genre;
-    }
+	var genre = obj.meta[M_GENRE]; 
+	if (!genre) { 
+		genre = 'Unknown'; 
+		genres[0] = 'Unknown'; 
+	} 
+	else { 
+		genres = genre.split('/,\s*/'); 
+		desc = desc + ', ' + genres[0]; 
+	} //Only first genre in description 
+	
     
     var description = obj.meta[M_DESCRIPTION];
     if (!description) 
@@ -121,7 +122,7 @@ function addAudio(obj)
         temp = artist_full;
     
     if (album_full)
-        temp = temp + ' - ' + album_full + ' - ';
+        temp = temp + ' - ' + date + ' - ' + album_full + ' - ';
     else
         temp = temp + ' - ';
    
@@ -131,19 +132,34 @@ function addAudio(obj)
     chain = new Array('Audio', 'Artists', artist, 'All - full name');
     addCdsObject(obj, createContainerChain(chain));
     
-    chain = new Array('Audio', 'Artists', artist, album);
+    chain = new Array('Audio', 'Artists', artist, date + ' - ' + album);
     obj.title = track + title;
     addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ALBUM);
     
     chain = new Array('Audio', 'Albums', album);
-    obj.title = track + title; 
+    obj.title = track + title;
     addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ALBUM);
     
-    chain = new Array('Audio', 'Genres', genre);
-    addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
+	// GENRE // 
+	chain = new Array('Audio', 'Genre', genres[i], 'Artists', artist);
+	obj.title = title + ' - ' + album_full;
+	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
+	chain = new Array('Audio', 'Genre', genres[0]);
+	obj.title = title + ' - ' + artist_full;
+	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
+	for (var i = 1; i < genres.length; i++) {
+		chain = new Array('Audio', 'Genre', genres[0], genres[i], 'Artists', artist);
+		obj.title = title + ' - ' + album_full;
+		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
+		chain = new Array('Audio', 'Genre', genres[0], genres[i]);
+		obj.title = title + ' - ' + artist_full;
+		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
+	}
+
     
     chain = new Array('Audio', 'Year', date);
     addCdsObject(obj, createContainerChain(chain));
+
 }
 
 function addVideo(obj)
@@ -295,9 +311,9 @@ if (getPlaylistType(orig.mimetype) == '')
     
     if (mime == 'audio')
     {
-        if (obj.onlineservice == ONLINE_SERVICE_WEBORAMA)
-            addWeborama(obj);
-        else
+        //if (obj.onlineservice == ONLINE_SERVICE_WEBORAMA)
+        //    addWeborama(obj);
+        //else
             addAudio(obj);
     }
     
