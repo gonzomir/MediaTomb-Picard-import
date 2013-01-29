@@ -62,7 +62,11 @@ function addAudio(obj)
     
     desc = desc + title;
     
-    var date = obj.meta[M_DATE];
+    var date = obj.aux['TDOR'];
+    if (!date)
+    {
+		date = obj.meta[M_DATE];
+	}
     if (!date)
     {
         date = 'Unknown';
