@@ -74,12 +74,13 @@ function addAudio(obj)
     }
     
 	var genre = obj.meta[M_GENRE]; 
+	var genres = new Array();
 	if (!genre) { 
 		genre = 'Unknown'; 
 		genres[0] = 'Unknown'; 
 	} 
 	else { 
-		genres = genre.split('/,\s*/'); 
+		genres = genre.split(/[,;\/]\s*/); 
 		desc = desc + ', ' + genres[0]; 
 	} //Only first genre in description 
 	
@@ -89,11 +90,7 @@ function addAudio(obj)
     {
         obj.meta[M_DESCRIPTION] = desc;
     }
-
-// uncomment this if you want to have track numbers in front of the title
-// in album view
     
-/*    
     var track = obj.meta[M_TRACKNUMBER];
     if (!track)
         track = '';
@@ -105,9 +102,6 @@ function addAudio(obj)
         }
         track = track + ' ';
     }
-*/
-    // comment the following line out if you uncomment the stuff above  :)
-    var track = '';
 
     var chain = new Array('Audio', 'All Audio');
     obj.title = title;
@@ -125,6 +119,10 @@ function addAudio(obj)
         temp = temp + ' - ' + date + ' - ' + album_full + ' - ';
     else
         temp = temp + ' - ';
+
+
+    print(temp + title + ' :: ' + genres.join(' -- '));
+
    
     obj.title = temp + title;
     addCdsObject(obj, createContainerChain(chain));
@@ -141,17 +139,17 @@ function addAudio(obj)
     addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ALBUM);
     
 	// GENRE // 
-	chain = new Array('Audio', 'Genre', genres[i], 'Artists', artist);
+	chain = new Array('Audio', 'Genres', genres[0], 'Artists', artist);
 	obj.title = title + ' - ' + album_full;
 	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
-	chain = new Array('Audio', 'Genre', genres[0]);
+	chain = new Array('Audio', 'Genres', genres[0]);
 	obj.title = title + ' - ' + artist_full;
 	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
 	for (var i = 1; i < genres.length; i++) {
-		chain = new Array('Audio', 'Genre', genres[0], genres[i], 'Artists', artist);
+		chain = new Array('Audio', 'Genres', genres[0], genres[i], 'Artists', artist);
 		obj.title = title + ' - ' + album_full;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
-		chain = new Array('Audio', 'Genre', genres[0], genres[i]);
+		chain = new Array('Audio', 'Genres', genres[0], genres[i]);
 		obj.title = title + ' - ' + artist_full;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
 	}
