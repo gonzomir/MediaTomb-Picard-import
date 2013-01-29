@@ -150,12 +150,21 @@ function addAudio(obj)
 	obj.title = title + ' - ' + artist_full;
 	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
 	for (var i = 1; i < genres.length; i++) {
+
+		chain = new Array('Audio', 'Genres', genres[i], 'Artists', artist);
+		obj.title = title + ' - ' + album_full;
+		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
+		chain = new Array('Audio', 'Genres', genres[i]);
+		obj.title = title + ' - ' + artist_full;
+		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
+
 		chain = new Array('Audio', 'Genres', genres[0], genres[i], 'Artists', artist);
 		obj.title = title + ' - ' + album_full;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
 		chain = new Array('Audio', 'Genres', genres[0], genres[i]);
 		obj.title = title + ' - ' + artist_full;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
+
 	}
 
     
