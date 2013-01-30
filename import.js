@@ -62,11 +62,7 @@ function addAudio(obj)
     
     desc = desc + title;
     
-    var date = obj.aux['TDOR'];
-    if (!date)
-    {
-		date = obj.meta[M_DATE];
-	}
+    var date = obj.aux['TDOR'] || obj.aux['TORY'] || obj.aux['ORIGINALDATE'] || obj.meta[M_DATE];
     if (!date)
     {
         date = 'Unknown';
@@ -106,6 +102,9 @@ function addAudio(obj)
         }
         track = track + ' ';
     }
+    
+    var decade = obj.aux['COMM:Songs-DB_Custom1'] || obj.aux['COMMENT:Songs-DB_Custom1'] || obj.aux['Comment:Songs-DB_Custom1'];
+    
 
     var chain = new Array('Audio', 'All Audio');
     obj.title = title;
@@ -125,9 +124,7 @@ function addAudio(obj)
         temp = temp + ' - ';
 
 
-    print(temp + title + ' :: ' + genres.join(' -- '));
-
-   
+  
     obj.title = temp + title;
     addCdsObject(obj, createContainerChain(chain));
     
@@ -152,14 +149,14 @@ function addAudio(obj)
 	for (var i = 1; i < genres.length; i++) {
 
 		chain = new Array('Audio', 'Genres', genres[i], 'Artists', artist);
-		obj.title = title + ' - ' + album_full;
+		obj.title = temp + title;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
 		chain = new Array('Audio', 'Genres', genres[i]);
 		obj.title = title + ' - ' + artist_full;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
 
 		chain = new Array('Audio', 'Genres', genres[0], genres[i], 'Artists', artist);
-		obj.title = title + ' - ' + album_full;
+		obj.title = temp + title;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
 		chain = new Array('Audio', 'Genres', genres[0], genres[i]);
 		obj.title = title + ' - ' + artist_full;
@@ -169,7 +166,15 @@ function addAudio(obj)
 
     
     chain = new Array('Audio', 'Year', date);
+	obj.title = temp + title;
     addCdsObject(obj, createContainerChain(chain));
+
+	// DECADE //
+	if(decade){
+		chain = new Array('Audio', 'Decade', decade);
+		obj.title = temp + title;
+		addCdsObject(obj, createContainerChain(chain));
+	}
 
 }
 
