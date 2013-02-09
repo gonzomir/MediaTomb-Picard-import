@@ -155,13 +155,6 @@ function addAudio(obj)
 		obj.title = title + ' - ' + artist_full;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
 
-		chain = new Array('Audio', 'Genres', genres[0], genres[i], 'Artists', artist);
-		obj.title = temp + title;
-		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
-		chain = new Array('Audio', 'Genres', genres[0], genres[i]);
-		obj.title = title + ' - ' + artist_full;
-		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
-
 	}
 
     
