@@ -45,6 +45,14 @@ function addAudio(obj)
         desc = artist;
     }
     
+    var albumartist = obj.aux['TPE2'] || obj.aux['ALBUMARTIST'] || obj.aux['Album Artist'] || obj.aux['aART'] || obj.aux['WM/AlbumArtist'];
+    if (!albumartist)
+    {
+		albumartist = artist;
+	}
+	
+	var artists = artist.split(/\sfeat[^\s]*\s|,\s*|\s&\s|\sand\s/i);
+    
     var album = obj.meta[M_ALBUM];
     if (!album) 
     {
@@ -106,66 +114,65 @@ function addAudio(obj)
     var decade = obj.aux['COMM:Songs-DB_Custom1'] || obj.aux['COMMENT:Songs-DB_Custom1'] || obj.aux['Comment:Songs-DB_Custom1'];
     
 
-    var chain = new Array('Audio', 'All Audio');
-    obj.title = title;
-    addCdsObject(obj, createContainerChain(chain));
-    
-    chain = new Array('Audio', 'Artists', artist, 'All Songs');
-    addCdsObject(obj, createContainerChain(chain));
-    
-    chain = new Array('Audio', 'All - full name');
     var temp = '';
     if (artist_full)
         temp = artist_full;
     
     if (album_full)
-        temp = temp + ' - ' + date + ' - ' + album_full + ' - ';
+        temp = temp + ' - ' + date + ' - ' + album + ' - ';
     else
         temp = temp + ' - ';
 
 
-  
-    obj.title = temp + title;
+    chain = new Array('Audio', 'All - full name');
+    obj.title = temp + track + title;
     addCdsObject(obj, createContainerChain(chain));
     
-    chain = new Array('Audio', 'Artists', artist, 'All - full name');
+    chain = new Array('Audio', 'Artists', albumartist, 'All - full name');
     addCdsObject(obj, createContainerChain(chain));
     
-    chain = new Array('Audio', 'Artists', artist, date + ' - ' + album);
-    obj.title = track + title;
+    if(artists.length > 1 && albumartist != artist)
+    {
+		for (i = 0; i < artists.length; i++)
+		{
+			var a = artists[i].trim();
+			if(a != albumartist)
+			{
+				chain = new Array('Audio', 'Artists', a, 'All - full name');
+				addCdsObject(obj, createContainerChain(chain));
+			}
+		}
+	}
+
+    chain = new Array('Audio', 'Artists', albumartist, date + ' - ' + album);
+    obj.title = title;
     addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ALBUM);
     
-    chain = new Array('Audio', 'Albums', album);
-    obj.title = track + title;
+    
+    chain = new Array('Audio', 'Albums', date + ' - ' + album + ' - ' + albumartist);
+    obj.title = title;
     addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ALBUM);
     
 	// GENRE // 
-	chain = new Array('Audio', 'Genres', genres[0], 'Artists', artist);
-	obj.title = title + ' - ' + album_full;
-	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
-	chain = new Array('Audio', 'Genres', genres[0]);
-	obj.title = title + ' - ' + artist_full;
-	addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
-	for (var i = 1; i < genres.length; i++) {
+	for (var i = 0; i < genres.length; i++) {
 
-		chain = new Array('Audio', 'Genres', genres[i], 'Artists', artist);
-		obj.title = temp + title;
+		chain = new Array('Audio', 'Genres', genres[i], 'Artists', albumartist);
+		obj.title = title + ' - ' + date + ' - ' + album;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_ARTIST);
 		chain = new Array('Audio', 'Genres', genres[i]);
-		obj.title = title + ' - ' + artist_full;
+		obj.title = title + ' - ' + artist;
 		addCdsObject(obj, createContainerChain(chain), UPNP_CLASS_CONTAINER_MUSIC_GENRE);
 
 	}
-
     
     chain = new Array('Audio', 'Year', date);
-	obj.title = temp + title;
+	obj.title = temp + track + title;
     addCdsObject(obj, createContainerChain(chain));
 
 	// DECADE //
 	if(decade){
 		chain = new Array('Audio', 'Decade', decade);
-		obj.title = temp + title;
+		obj.title = temp + track + title;
 		addCdsObject(obj, createContainerChain(chain));
 	}
 
@@ -349,3 +356,8 @@ if (getPlaylistType(orig.mimetype) == '')
             addAudio(obj);
     }
 }
+
+''.trim || (String.prototype.trim = // Use the native method if available, otherwise define a polyfill:
+function () { // trim returns a new string (which replace supports)
+	return this.replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/g,'') // trim the left and right sides of the string
+});

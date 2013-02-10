@@ -7,7 +7,7 @@ Features
 --------
 
 * Deal with multiple genres, separated by comma or semicolon.
-* Use the first genre as magor and the next as sub-genres if desired.
+* Use Album Artist field if available, split Artist field and add the song to all artists.
 * Use Original Release Date field for album year and add it to full names for sorting the albums in chronological order.
 
 Issues
